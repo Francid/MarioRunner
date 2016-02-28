@@ -23,6 +23,8 @@ public class MarioController : MonoBehaviour {
 	public VelocityRange velocityRange;
 	public float marioMoveForce;
 	public float marioJumpForce;
+	public float cameraPositionX;
+	public float cameraPositionY;
 
 	// PRIVATE INSTANCE VARIABLE
 	private Transform _transform;
@@ -32,6 +34,11 @@ public class MarioController : MonoBehaviour {
 	private float _verticalMove;
 	private bool _moveLeft;
 	private bool _isGrounded;
+	private AudioSource[] _audioSources;
+	private AudioSource _jumpSound;
+	private AudioSource _coinSound;
+
+
 
 	// Use this for initialization
 	void Start () {
@@ -47,6 +54,12 @@ public class MarioController : MonoBehaviour {
 		this._verticalMove = 0f;
 		this._marioAnimator.SetInteger ("AnimState", 0);
 		this._moveLeft = true;
+
+		// Add Audio Source
+		this._audioSources = gameObject.GetComponents<AudioSource>();
+		this._jumpSound = this._audioSources [0];
+		this._coinSound = this._audioSources [1];
+
 	}
 	
 	// Update is called once per frame
@@ -55,7 +68,7 @@ public class MarioController : MonoBehaviour {
 		// Local Variable
 		float forceX = 0f;
 		float forceY = 0f;
-		Vector3 marioCurrentPosition = new Vector3(this._transform.position.x, this._transform.position.y, -10);
+		Vector3 marioCurrentPosition = new Vector3(this._transform.position.x + this.cameraPositionX, this._transform.position.y + this.cameraPositionY, -10);
 		this.playerCamera.position = marioCurrentPosition;
 
 		this._isGrounded = Physics2D.Linecast (
@@ -84,7 +97,7 @@ public class MarioController : MonoBehaviour {
 						forceX = this.marioMoveForce;
 					}
 					this._moveLeft = true;
-					flipMario ();
+					FlipMario ();
 				}
 				// Check if the Left arrow is pressed
 				if (this._horizontalMove < 0) {
@@ -94,7 +107,7 @@ public class MarioController : MonoBehaviour {
 						forceX = -this.marioMoveForce;
 					}
 					this._moveLeft = false;
-					flipMario ();
+					FlipMario ();
 				}
 
 				// Set Animation clip to walk
@@ -107,6 +120,7 @@ public class MarioController : MonoBehaviour {
 			if (this._verticalMove > 0) {
 				// jump force
 				if (absValueY < this.velocityRange.maximum) {
+					this._jumpSound.Play ();
 					forceY = this.marioJumpForce;
 				}
 			}
@@ -116,10 +130,19 @@ public class MarioController : MonoBehaviour {
 		}
 
 		this._rigidbody2D.AddForce (new Vector2 (forceX, forceY));
+
+
+	}
+
+	void OnCollisionEnter2D(Collision2D other){
+		if (other.gameObject.CompareTag ("Coin")) {
+			this._coinSound.Play ();
+			Destroy (other.gameObject);
+		}
 	}
 
 	// Private Methods
-	private void flipMario(){
+	private void FlipMario(){
 
 		if (this._moveLeft) {
 			this._transform.localScale = new Vector2 (1, 1);
@@ -128,4 +151,5 @@ public class MarioController : MonoBehaviour {
 		}
 
 	}
+		
 }
