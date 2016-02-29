@@ -25,6 +25,7 @@ public class MarioController : MonoBehaviour {
 	public float marioJumpForce;
 	public float cameraPositionX;
 	public float cameraPositionY;
+	public GameController gameController;
 
 	// PRIVATE INSTANCE VARIABLE
 	private Transform _transform;
@@ -138,6 +139,8 @@ public class MarioController : MonoBehaviour {
 		if (other.gameObject.CompareTag ("Coin")) {
 			this._coinSound.Play ();
 			Destroy (other.gameObject);
+			// Add coin count
+			this.gameController.CoinValue +=2;
 		}
 	}
 

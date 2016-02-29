@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour {
 	public Transform enemyWeakSpot;
 	public float enemySpeed;
 	public float dragSpeed;
+	public GameController gameController;
 
 	// PRIVATE INSTANCE VARIABLES
 	private Transform _transform;
@@ -55,7 +56,6 @@ public class EnemyController : MonoBehaviour {
 			this._transform.position,
 			this.boundaryCheck.position,
 		1 << LayerMask.NameToLayer("EnemyBoundary"));
-		Debug.DrawLine (this._transform.position, this.boundaryCheck.position);
 
 		// Check if the Enemy Reached the boundary
 		if (this._reachBoundary) {
@@ -114,11 +114,15 @@ public class EnemyController : MonoBehaviour {
 			this._enemyAnimation.SetInteger ("EnemyState", 2);
 			this._enemyCollider.isTrigger = true;
 			this._stompSound.Play ();
+			//Add score to the player
+			this.gameController.ScoreValue += 10;
 
 		} else {
 			if (other.gameObject.CompareTag ("Mario")) {
 				Debug.Log ("Mario Collide");
 				this._bumpSound.Play ();
+				// Subtract player life
+				this.gameController.LivesValue--;
 			}
 		}
 	}
